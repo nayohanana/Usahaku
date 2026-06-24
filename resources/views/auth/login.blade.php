@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Login - UsahaKu</title>
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f0f4f8;
+            padding: 20px;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(ellipse at 20% 50%, rgba(26, 42, 74, 0.05) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 50%, rgba(34, 197, 94, 0.05) 0%, transparent 60%);
+            z-index: 0;
+        }
+
+        .login-wrapper {
+            width: 100%;
+            max-width: 420px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .login-card {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 44px 36px 36px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.06), 0 4px 16px rgba(0, 0, 0, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+        }
+
+        .brand {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .brand .logo {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 56px;
+            height: 56px;
+            background: #1a2a4a;
+            border-radius: 14px;
+            margin-bottom: 16px;
+            transition: transform 0.3s;
+        }
+
+        .brand .logo:hover {
+            transform: scale(1.05);
+        }
+
+        .brand .logo i {
+            font-size: 26px;
+            color: #ffffff;
+        }
+
+        .brand h1 {
+            font-size: 26px;
+            font-weight: 700;
+            color: #0f172a;
+            letter-spacing: -0.5px;
+            margin: 0;
+        }
+
+        .brand h1 span {
+            color: #22c55e;
+        }
+
+        .brand p {
+            color: #94a3b8;
+            font-size: 14px;
+            margin-top: 4px;
+            font-weight: 400;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 6px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper .input-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            font-size: 15px;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .input-wrapper .form-control {
+            width: 100%;
+            padding: 11px 16px 11px 44px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 14px;
+            background: #f8fafc;
+            transition: all 0.25s;
+            font-family: inherit;
+            color: #0f172a;
+        }
+
+        .input-wrapper .form-control:focus {
+            outline: none;
+            border-color: #1a2a4a;
+            background: #ffffff;
+            box-shadow: 0 0 0 4px rgba(26, 42, 74, 0.06);
+        }
+
+        .input-wrapper .form-control.is-invalid {
+            border-color: #ef4444;
+        }
+
+        .input-wrapper .form-control.is-invalid:focus {
+            box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.08);
+        }
+
+        .input-wrapper .toggle-password {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+            padding: 4px;
+            font-size: 15px;
+            z-index: 2;
+            transition: color 0.2s;
+        }
+
+        .input-wrapper .toggle-password:hover {
+            color: #1e293b;
+        }
+
+        .error-text {
+            font-size: 12px;
+            color: #ef4444;
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .options .form-check {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .options .form-check-input {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            border: 1.5px solid #cbd5e1;
+            cursor: pointer;
+            accent-color: #1a2a4a;
+        }
+
+        .options .form-check-label {
+            font-size: 13px;
+            color: #64748b;
+            cursor: pointer;
+        }
+
+        .options .forgot-link {
+            font-size: 13px;
+            color: #64748b;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .options .forgot-link:hover {
+            color: #1a2a4a;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 13px;
+            background: #1a2a4a;
+            border: none;
+            border-radius: 10px;
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-login:hover {
+            background: #2a3a6a;
+            transform: translateY(-1px);
+            box-shadow: 0 8px 28px rgba(26, 42, 74, 0.18);
+        }
+
+        .btn-login:active {
+            transform: translateY(0);
+        }
+
+        .btn-login:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .alert-custom {
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            border: 1px solid transparent;
+        }
+
+        .alert-custom.alert-danger {
+            background: #fef2f2;
+            border-color: #fecaca;
+            color: #dc2626;
+        }
+
+        .alert-custom.alert-success {
+            background: #f0fdf4;
+            border-color: #bbf7d0;
+            color: #16a34a;
+        }
+
+        .alert-custom i {
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .login-footer {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 13px;
+            color: #94a3b8;
+        }
+
+        .login-footer a {
+            color: #1a2a4a;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .login-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #ffffff;
+            animation: spin 0.7s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 480px) {
+            .login-card {
+                padding: 32px 20px 24px;
+            }
+            .brand h1 {
+                font-size: 22px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-wrapper">
+        <div class="login-card">
+
+            <!-- Brand -->
+            <div class="brand">
+                <div class="logo">
+                    <i class="fas fa-store"></i>
+                </div>
+                <h1>Usaha<span>Ku</span></h1>
+                <p>Kelola Penjualan, Stok, dan Keuangan Usaha dengan Mudah</p>
+            </div>
+
+            <!-- Alert -->
+            @if(session('status'))
+                <div class="alert-custom alert-success">
+                    <i class="fas fa-check-circle"></i>
+                    {{ session('status') }}
+                </div>
+            @endif
+
+            @if($errors->any())
+                <div class="alert-custom alert-danger">
+                    <i class="fas fa-exclamation-circle"></i>
+                    {{ $errors->first() }}
+                </div>
+            @endif
+
+            <!-- Form -->
+            <form method="POST" action="{{ route('login') }}" id="loginForm">
+                @csrf
+
+                <div class="form-group">
+                    <label for="email">Alamat Email</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon"><i class="fas fa-envelope"></i></span>
+                        <input type="email" class="form-control @error('email') is-invalid @enderror" 
+                               id="email" name="email" value="{{ old('email') }}" 
+                               placeholder="admin@usahaku.com" required autofocus>
+                    </div>
+                    @error('email')
+                        <div class="error-text"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon"><i class="fas fa-lock"></i></span>
+                        <input type="password" class="form-control @error('password') is-invalid @enderror" 
+                               id="password" name="password" placeholder="••••••••" required>
+                        <button type="button" class="toggle-password" id="togglePassword">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    @error('password')
+                        <div class="error-text"><i class="fas fa-circle-exclamation"></i> {{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="options">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="remember" name="remember">
+                        <label class="form-check-label" for="remember">Ingat saya</label>
+                    </div>
+                    @if (Route::has('password.request'))
+                        <a href="{{ route('password.request') }}" class="forgot-link">Lupa password?</a>
+                    @endif
+                </div>
+
+                <button type="submit" class="btn-login" id="loginBtn">
+                    <i class="fas fa-sign-in-alt"></i>
+                    <span>Masuk</span>
+                </button>
+
+            </form>
+
+            <!-- Footer -->
+            <div class="login-footer">
+                &copy; {{ date('Y') }} <a href="#">UsahaKu</a>. All rights reserved.
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Toggle Password
+        const toggleBtn = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('password');
+
+        toggleBtn.addEventListener('click', function() {
+            const type = passwordInput.type === 'password' ? 'text' : 'password';
+            passwordInput.type = type;
+            this.querySelector('i').classList.toggle('fa-eye');
+            this.querySelector('i').classList.toggle('fa-eye-slash');
+        });
+
+        // Loading State
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            const btn = document.getElementById('loginBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Memproses...';
+        });
+    </script>
+
+</body>
+</html>
